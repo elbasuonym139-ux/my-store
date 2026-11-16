@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - إدارة الطلبات</title>
+    <style>
+        * { box-sizing: border-box; font-family: Tahoma, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f4f4f9; color: #333; padding: 20px; }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .container { max-width: 1000px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background: #111; color: #fff; }
+        tr:nth-child(even) { background: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🛠️ لوحة تحكم المتجر (الطلبات الواردة)</h1>
+        <p>هنا هتظهر كل الأوردرات اللي العملاء هيبعتوها من الموقع لحظياً:</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم العميل</th>
+                    <th>رقم التليفون</th>
+                    <th>العنوان</th>
+                    <th>المنتج المطلوب</th>
+                    <th>السعر</th>
+                    <th>وقت الطلب</th>
+                </tr>
+            </thead>
+            <tbody id="orders-table">
+                <tr>
+                    <td colspan="6" style="color: #777;">جاري تحميل الطلبات...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCXSLqtba3kdvq9RjnIWLeM.d8xT_H723TSay",
+            authDomain: "my-store-7a81c.firebaseapp.com",
+            projectId: "my-store-7a81c",
+            storageBucket: "my-store-7a81c.firebasestorage.app",
+            messagingSenderId: "1003491501822",
+            appId: "1:1003491501822:web:f3ddc2chb151bbd033a27af"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const tableBody = document.getElementById('orders-table');
+
+        db.collection("orders").onSnapshot((snapshot) => {
+            tableBody.innerHTML = '';
+            
+            if (snapshot.empty) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="color: #777;">لا توجد طلبات حتى الآن...</td></tr>`;
+                return;
+            }
+
+            snapshot.forEach((doc) => {
+                let order = doc.data();
+                let row = `<tr>
+                    <td>${order.customerName}</td>
+                    <td>${order.customerPhone}</td>
+                    <td>${order.customerAddress}</td>
+                    <td>${order.productName}</td>
+                    <td>${order.productPrice} جنيه</td>
+                    <td>${order.orderDate}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        });
+    </script>
+</body>
+</html>
